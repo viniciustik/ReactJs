@@ -26,31 +26,32 @@ class Login extends Component {
     };
 
     const handleSubmit = values => {
+      localStorage.setItem('app-token', '2522')
+      history.push('/dashboard')
+      // const map = {
+      //   password: values.password,
+      //   email: values.email
+      // }
 
-      const map = {
-        password: values.password,
-        email: values.email
-      }
-
-      axios.post(`${URL_login}/login`, map)
-        .then(resp => {
-          const { data } = resp
-          if (data) {
-            // console.log(data.name, data.password)
-            // const password = descriptografar(data.password)
-            // console.log(password)
-            if (data.password == map.password) {
-              localStorage.setItem('app-token', data.token)
-              history.push('/dashboard')
-            }
-            else {
-              alert("Senha Incorreta!", { icon: "warning" })
-            }
-          }
-          else {
-            alert('Usuário e senha incorreto!')
-          }
-        })
+      // axios.post(`${URL_login}/login`, map)
+      //   .then(resp => {
+      //     const { data } = resp
+      //     if (data) {
+      //      
+      //       const password = descriptografar(data.password)
+      //      
+      //       if (data.password == map.password) {
+      //         localStorage.setItem('app-token', data.token)
+      //         history.push('/dashboard')
+      //       }
+      //       else {
+      //         alert("Senha Incorreta!", { icon: "warning" })
+      //       }
+      //     }
+      //     else {
+      //       alert('Usuário e senha incorreto!')
+      //     }
+      //   })
     }
 
     const validations = yup.object().shape({
@@ -69,7 +70,7 @@ class Login extends Component {
                     <Formik
                       initialValues={{}}
                       onSubmit={handleSubmit}
-                      validationSchema={validations}
+                    // validationSchema={validations}
                     >
                       <Form >
                         <h1>Login</h1>

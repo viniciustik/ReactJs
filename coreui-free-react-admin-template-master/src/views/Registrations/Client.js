@@ -66,6 +66,12 @@ class FormProvider extends Component {
         }
         else
             errors.nameCityError = false;
+        if (!dados.cellPhone && dados.cellPhone.length < 13) {
+            isError++;
+            errors.cellPhoneError = true;
+        }
+        else
+            errors.cellPhoneError = false;
 
         this.setState({
             errors
@@ -98,7 +104,7 @@ class FormProvider extends Component {
         if (this.validate() == 0) {
 
             let data = {
-                id: modelClient.id,
+                id: parseInt(modelClient.id),
                 name: modelClient.name,
                 document: modelClient.document,
                 zipCode: CharacterRemover.removeAll(modelClient.zipCode),
@@ -108,7 +114,9 @@ class FormProvider extends Component {
                 nameCity: modelClient.nameCity,
                 cellPhone: CharacterRemover.removeAll(modelClient.cellPhone)
             }
-            console.log(data)
+
+
+
             if (data.id > 0) {
                 await axios.put(URL_Client, data).then(resp => {
                     const { data } = resp
@@ -116,6 +124,7 @@ class FormProvider extends Component {
                         swal("Atualizado com sucesso!", { icon: "success" }).then(r => {
                             if (r) {
                                 this.clearModelClient();
+                                this.props.consultAll();
                             }
                         })
 
@@ -129,7 +138,8 @@ class FormProvider extends Component {
                     if (data) {
                         swal("Salvo com sucesso!", { icon: "success" }).then(r => {
                             if (r) {
-                                this.clearModelClient()
+                                this.clearModelClient();
+                                this.props.consultAll();
                             }
                         })
                     }
@@ -176,8 +186,7 @@ class FormProvider extends Component {
     }
     render() {
         const { modelClient, errors } = this.state;
-        console.log(modelClient)
-        console.log(errors)
+
         return (
             <div>
 
@@ -317,7 +326,7 @@ class FormProvider extends Component {
                                         <Input id="cellphone"
                                             name="cellphone"
                                             type="text"
-                                            required
+                                            invalid={errors.cellPhoneError}
                                             mask='(99) 9 9999-9999'
                                             tag={InputMask}
                                             value={modelClient.cellPhone}
@@ -359,7 +368,7 @@ class ListFormProvider extends Component {
         else
             pageSize = pageSizeValue;
 
-        /// this.props.consultTreatment(pageSize, pageNumber);
+        this.props.consultByPagination(pageSize, pageNumber);
     }
 
     onEdit = (client) => {
@@ -452,9 +461,24 @@ export default class Provider extends Component {
     }
 
     componentDidMount() {
-        this.consulAll();
+        this.consultAll();
     }
-    consulAll = async () => {
+    consultByPagination = async (pageSize, pageNumber) => {
+
+        await axios.get(URL_Client, {
+            params: {
+                pageSize: pageSize, pageNumber: pageNumber
+            }
+        }).then(resp => {
+            const { data } = resp
+            if (data) {
+                this.setState({
+                    formClient: data
+                })
+            }
+        })
+    }
+    consultAll = async () => {
         await axios.get(URL_Client).then(resp => {
             const { data } = resp
             if (data) {
@@ -474,13 +498,14 @@ export default class Provider extends Component {
                     <div className="col-md-5 my-3">
                         <ListFormProvider
                             formClient={formClient}
+                            consultByPagination={this.consultByPagination}
                         />
 
                     </div>
 
                     <div className="col-md-7 my-3" >
                         <FormProvider
-
+                            consultAll={this.consultAll}
                         />
                     </div>
                 </div>

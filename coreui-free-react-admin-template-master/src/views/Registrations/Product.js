@@ -38,7 +38,6 @@ class FormProduct extends Component {
     buscaCidades = (e) => {
         const data = json_city.states;
         const val = e.target.value
-        console.log("ccc", val)
         if (val != '') {
             //  this.setValues(e, 'nameState');
             var filterObj = data.find(function (item, i) {
@@ -68,7 +67,7 @@ class FormProduct extends Component {
                                 <div className="col-md-8">
                                     <Label htmlFor="nameService">Nome Produto:*</Label>
                                     <Input
-                                     type="text"
+                                        type="text"
                                         id="nameService"
                                         className="form-control-warning"
                                         required
@@ -86,8 +85,8 @@ class FormProduct extends Component {
                                     >
                                     </Input>
                                 </div>
-                                </div>
-                                </FormGroup>
+                            </div>
+                        </FormGroup>
                         <Button type="submit" size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Salvar</Button>
                         <p className="float-right text-sm">
                             <i>Os campos marcados com (*) são obrigatórios</i>
@@ -126,7 +125,7 @@ class ListFormProduct extends Component {
                                 <td>
                                     <Button color="secondary" outline>
                                         <i className="cui-pencil"></i>&nbsp;Editar
-                   </Button>
+                                    </Button>
                                 </td>
                             </tr>
                         </tbody>
@@ -146,12 +145,12 @@ export default class Products extends Component {
                 <div className="row">
 
                     <div className="col-md-4 my-3">
-                    <ListFormProduct />
-                     
+                        <ListFormProduct />
+
                     </div>
 
                     <div className="col-md-8 my-3" >
-                    <FormProduct />
+                        <FormProduct />
                     </div>
                 </div>
             </div>
