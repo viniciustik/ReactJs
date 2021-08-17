@@ -14,6 +14,11 @@ import {
 } from 'reactstrap';
 import CurrencyInput from 'react-currency-input';
 import ConvertToUSD from './../../ConvertCurrency';
+import Axios from 'axios';
+import { URL_Service } from './../../services/serviceProvidedService';
+import swal from 'sweetalert';
+import NumberFormat from 'react-number-format';
+import PubSub from 'pubsub-js';
 
 class FormService extends Component {
 
@@ -45,12 +50,56 @@ class FormService extends Component {
 
         return isError;
     }
-
+    clear() {
+        this.setState({ modelService: { id: 0, name: '', value: '' } })
+    }
     save = async () => {
         if (this.validate() == 0) {
-            const valueProduct = ConvertToUSD(data.valueProduct)
-            //usar parsefloat
+            const { modelService } = this.state
+            const valueService = ConvertToUSD(modelService.value)
+            let data = {
+                idCompany: modelService.idCompany,
+                id: modelService.id,
+                name: modelService.name,
+                value: parseFloat(valueService)
+            }
+            if (data.id > 0) {
+                await Axios.put(URL_Service, data).then(resp => {
+                    const { data } = resp
+                    if (data) {
+                        swal('Atualizado com Sucesso!', {
+                            icon: 'success'
+                        }).then(r => {
+                            if (r)
+                                this.clear();
+                            this.props.consultAll();
+                        })
+                    }
+                })
+            } else {
+                await Axios.post(URL_Service, data).then(resp => {
+                    const { data } = resp
+                    if (data) {
+                        swal('Salvo com Sucesso!', {
+                            icon: 'success'
+                        }).then(r => {
+                            if (r)
+                                this.clear();
+                            this.props.consultAll();
+                        })
+                    }
+                })
+            }
+
         }
+    }
+    componentWillMount() {
+        PubSub.subscribe('edit-service', (topic, service) => {
+
+            this.setState({
+                modelService: service,
+            })
+        })
     }
 
     render() {
@@ -90,7 +139,7 @@ class FormService extends Component {
                                 </div>
                             </div>
                         </FormGroup>
-                        <Button onClick={e => this.save} size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Salvar</Button>
+                        <Button onClick={e => this.save()} size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Salvar</Button>
                         <p className="float-right text-sm">
                             <i>Os campos marcados com (*) são obrigatórios</i>
                         </p>
@@ -103,9 +152,12 @@ class FormService extends Component {
 
 
 class ListFormService extends Component {
-
+    onEdit = (service) => {
+        PubSub.publish('edit-service', service)
+    }
 
     render() {
+        const { formService } = this.props
         return (
             <Card>
                 <CardHeader>
@@ -122,15 +174,27 @@ class ListFormService extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Carwyn Fachtna</td>
-                                <td>R$ 100</td>
-                                <td>
-                                    <Button color="secondary" outline>
-                                        <i className="cui-pencil"></i>&nbsp;Editar
-                                    </Button>
-                                </td>
-                            </tr>
+                            {
+                                formService.results.map(s => (
+                                    <tr>
+
+                                        <td>{s.name}</td>
+                                        <td> <NumberFormat
+                                            displayType={'text'}
+                                            value={s.value}
+                                            thousandSeparator={'.'}
+                                            decimalSeparator={','}
+                                            prefix={'R$'}
+                                        /></td>
+                                        <td>
+                                            <Button onClick={e => this.onEdit(s)} color="secondary" outline>
+                                                <i className="cui-pencil"></i>
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+
                         </tbody>
                     </Table>
                 </CardBody>
@@ -142,18 +206,40 @@ class ListFormService extends Component {
 
 export default class Service extends Component {
 
+    state = {
+        formService: { results: [], currentPage: '', pageCount: '', pageSize: '' }
+    }
+
+    componentDidMount() {
+        this.consultAll()
+    }
+
+    consultAll = async () => {
+        await Axios.get(URL_Service).then(resp => {
+            const { data } = resp
+            if (data) {
+                this.setState({
+                    formService: data
+                })
+            }
+        })
+    }
+
     render() {
         return (
             <div>
                 <div className="row">
 
                     <div className="col-md-4 my-3">
-                        <ListFormService />
+                        <ListFormService
+                            formService={this.state.formService}
+                        />
 
                     </div>
 
                     <div className="col-md-8 my-3" >
-                        <FormService />
+                        <FormService
+                            consultAll={this.consultAll} />
                     </div>
                 </div>
             </div>
