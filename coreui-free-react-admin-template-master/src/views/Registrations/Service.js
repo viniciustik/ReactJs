@@ -1,60 +1,60 @@
 import React, { Component, Suspense } from 'react';
 import {
-    Badge,
+
     Button,
     Card,
     CardBody,
-    CardFooter,
     CardHeader,
-    Col,
-    Collapse,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Fade,
     Form,
     FormGroup,
-    FormText,
     FormFeedback,
     Input,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupButtonDropdown,
-    InputGroupText,
     Label,
-    Row,
     Table
 } from 'reactstrap';
-import InputMask from 'react-input-mask';
-import json_city from './json_cities.json';
-import CurrencyInput from './../../CurrencyInput';
+import CurrencyInput from 'react-currency-input';
+import ConvertToUSD from './../../ConvertCurrency';
 
 class FormService extends Component {
 
     state = {
-        listCities: []
+        errors: {},
+        modelService: { id: 0, name: '', value: '' }
+    }
+    setValues = (e, field) => {
+        const { modelService } = this.state;
+        modelService[field] = e.target.value;
+        this.setState({ modelService });
     }
 
-    buscaCidades = (e) => {
-        const data = json_city.states;
-        const val = e.target.value
-        console.log("ccc", val)
-        if (val != '') {
-            //  this.setValues(e, 'nameState');
-            var filterObj = data.find(function (item, i) {
+    validate = () => {
+        let isError = 0;
+        const dados = this.state.modelService
+        const errors = {}
 
-                if (item.sigla === val) {
-                    const city = item.cidades
-                    return city
-                }
-            })
-            this.state.listCities = filterObj.cidades
-            this.setState({
-                ...this.state,
-            })
+        if (!dados.name) {
+            isError++;
+            errors.nameError = true;
+        }
+        else
+            errors.nameError = false;
+
+        this.setState({
+            errors
+        });
+
+        return isError;
+    }
+
+    save = async () => {
+        if (this.validate() == 0) {
+            const valueProduct = ConvertToUSD(data.valueProduct)
+            //usar parsefloat
         }
     }
+
     render() {
+        const { modelService, errors } = this.state
         return (
             <Card>
                 <CardHeader>
@@ -66,29 +66,31 @@ class FormService extends Component {
                         <FormGroup>
                             <div className='form-row'>
                                 <div className="col-md-8">
-                                    <Label htmlFor="nameService">Nome Serviço:*</Label>
+                                    <Label htmlFor="name">Nome Serviço:*</Label>
                                     <Input
-                                     type="text"
-                                        id="nameService"
-                                        className="form-control-warning"
-                                        required
+                                        type="text"
+                                        onChange={e => this.setValues(e, 'name')}
+                                        value={modelService.name}
+                                        invalid={errors.nameError}
                                     />
+                                    <FormFeedback></FormFeedback>
                                 </div>
                                 <div className="col-md-2">
                                     <Label htmlFor="serviceValue">Valor Serviço:*</Label>
-                                    <Input id="serviceValue"
-                                        name="serviceValue"
+                                    <CurrencyInput
+                                        className="form-control"
                                         type="text"
-                                        required
-                                        tag={CurrencyInput}
-                                    //value={this.state.model.nameCity}
-                                    //onChange={e => this.setValues(e, 'nameCity')}
+                                        decimalSeparator=","
+                                        thousandSeparator="."
+                                        prefix="R$"
+                                        onChangeEvent={e => this.setValues(e, 'value')}
+                                        value={modelService.value}
                                     >
-                                    </Input>
+                                    </CurrencyInput>
                                 </div>
-                                </div>
-                                </FormGroup>
-                        <Button type="submit" size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Salvar</Button>
+                            </div>
+                        </FormGroup>
+                        <Button onClick={e => this.save} size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Salvar</Button>
                         <p className="float-right text-sm">
                             <i>Os campos marcados com (*) são obrigatórios</i>
                         </p>
@@ -126,7 +128,7 @@ class ListFormService extends Component {
                                 <td>
                                     <Button color="secondary" outline>
                                         <i className="cui-pencil"></i>&nbsp;Editar
-                   </Button>
+                                    </Button>
                                 </td>
                             </tr>
                         </tbody>
@@ -146,12 +148,12 @@ export default class Service extends Component {
                 <div className="row">
 
                     <div className="col-md-4 my-3">
-                    <ListFormService />
-                     
+                        <ListFormService />
+
                     </div>
 
                     <div className="col-md-8 my-3" >
-                    <FormService />
+                        <FormService />
                     </div>
                 </div>
             </div>

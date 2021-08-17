@@ -28,16 +28,16 @@ export default {
       url: '/register/client',
       icon: 'icon-people',
     },
-    {
-      name: 'Prospect',
-      url: '/register/prospect',
-      icon: 'cui-dollar',
-    },
-    {
-      name: 'Vendedor',
-      url: '/register/salesman',
-      icon: 'fa fa-handshake-o',
-    },
+    // {
+    //   name: 'Prospect',
+    //   url: '/register/prospect',
+    //   icon: 'cui-dollar',
+    // },
+    // {
+    //   name: 'Vendedor',
+    //   url: '/register/salesman',
+    //   icon: 'fa fa-handshake-o',
+    // },
     {
       name: 'Serviços',
       url: '/register/service',
@@ -49,11 +49,11 @@ export default {
       url: '/register/product',
       icon: 'icon-basket-loaded',
     },
-    {
-      name: 'Empresas',
-      url: '/register/company',
-      icon: 'fa fa-cubes',
-    },
+    // {
+    //   name: 'Empresas',
+    //   url: '/register/company',
+    //   icon: 'fa fa-cubes',
+    // },
     {
       title: true,
       name: 'Movimentações',
@@ -63,11 +63,11 @@ export default {
       },
       class: ''             // optional class names space delimited list for title item ex: "text-center"
     },
-    {
-      name: 'Comissões',
-      url: '/register/commission',
-      icon: 'fa fa-gavel',
-    },
+    // {
+    //   name: 'Comissões',
+    //   url: '/register/commission',
+    //   icon: 'fa fa-gavel',
+    // },
     {
       name: 'Vendas',
       url: '/moves/sales',

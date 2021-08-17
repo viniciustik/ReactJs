@@ -104,6 +104,7 @@ class FormProvider extends Component {
         if (this.validate() == 0) {
 
             let data = {
+                idCompany: modelClient.idCompany,
                 id: parseInt(modelClient.id),
                 name: modelClient.name,
                 document: modelClient.document,
